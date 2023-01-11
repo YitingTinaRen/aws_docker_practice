@@ -95,4 +95,4 @@ if __name__=="__main__":
         **dbconfig
     )
     mydb.close()
-    app.run(port=config.PORT, debug=config.DEBUG)
+    app.run(port=config.PORT, debug=config.DEBUG, host=config.HOST)
