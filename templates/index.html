@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>圖文留言板</title>
+        <style>
+            .line{
+                width:100%;
+                height:1px;
+                background-color: grey;
+                margin: 10px 0;
+
+            }
+        </style>
+    </head>
+    <body>
+        <h2>發表一篇圖文</h2>
+        <label>文字內容</label><input name="content">
+        </br>
+        </br>
+        <label>圖片檔案</label>
+        <input type="file" id="myFile" name="file" accept="image/*" >
+        </br>
+        </br>
+        <button type="button" onclick="loadFile()">送出</button>
+        <div class="line"></div>
+    </body>
+    <script>
+        fetch('/api/history').then(function(res){
+            return res.json()
+        }).then(function(result){
+            console.log(result)
+            result.forEach(element => {
+                text=document.createElement("div");
+                text.append(document.createTextNode(element[0]));
+
+                pic=document.createElement("img");
+                pic.src=element[1];
+                pic.style.width="80px";
+                pic.style.height = "80px";
+
+
+                line=document.createElement("div");
+                line.setAttribute("class","line");
+
+                body=document.querySelector("body");
+                body.append(text);
+                body.append(pic);
+                body.append(line);
+            });
+        });
+
+        function loadFile() {
+            let image = document.getElementById('myFile').files[0];
+            let msg=document.getElementsByName("content")[0].value;
+
+            let formData =new FormData()
+            formData.append('file',image)
+            formData.append('content',msg)
+            fetch("/api/pic", {
+                method: "POST",
+                body: formData,
+            }).then(function (res) {
+                return res.json()
+            }).then(function (result) {
+                console.log(result);
+                document.getElementById("myFile").value = ""
+                document.getElementsByName("content")[0].value = ""
+                
+                text = document.createElement("div");
+                text.append(document.createTextNode(result[0]));
+
+                pic = document.createElement("img");
+                pic.src = result[1];
+                pic.style.width = "80px";
+                pic.style.height = "80px";
+
+
+                line = document.createElement("div");
+                line.setAttribute("class", "line");
+
+                firstline=document.querySelectorAll(".line")[0];
+                firstline.parentNode.insertBefore(text, firstline.nextSibling);
+                text.parentNode.insertBefore(pic, text.nextSibling);
+                pic.parentNode.insertBefore(line, pic.nextSibling);
+            });
+        }
+    </script>
+</html>
